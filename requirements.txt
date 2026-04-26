@@ -1,0 +1,22 @@
+# ── Core numerics ─────────────────────────────────────────────────────────────
+numpy>=1.24
+scipy>=1.10          # used by several notebooks for stats utilities
+
+# ── Data / IO ──────────────────────────────────────────────────────────────────
+pandas>=2.0
+
+# ── Deep learning (GPU build — install CUDA wheel separately if needed) ────────
+# On a cloud GPU instance with CUDA 12.x, replace with:
+#   pip install torch>=2.0 --index-url https://download.pytorch.org/whl/cu121
+torch>=2.0
+
+# ── Plotting ───────────────────────────────────────────────────────────────────
+matplotlib>=3.7
+
+# ── Notebooks ─────────────────────────────────────────────────────────────────
+jupyter>=1.0
+ipykernel>=6.0
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest>=7.0
+pytest-cov>=4.0

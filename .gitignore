@@ -1,0 +1,29 @@
+# ── Raw stock data (281 MB — too large for git) ───────────────────────────────
+us/
+
+# ── Experiment outputs ────────────────────────────────────────────────────────
+results/
+
+# ── Intermediate / cached artefacts ──────────────────────────────────────────
+nb01_fd_policies.npz
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# ── Jupyter checkpoints ───────────────────────────────────────────────────────
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# ── macOS noise ───────────────────────────────────────────────────────────────
+.DS_Store
+
+# ── Editor / IDE ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+
+# ── Claude internal ───────────────────────────────────────────────────────────
+.claude/
+test_write.txt
