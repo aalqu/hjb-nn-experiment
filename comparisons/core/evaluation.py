@@ -392,7 +392,8 @@ def evaluate_merton_benchmark(market_data, config, initial_wealth=1.0, seed=1):
 # ---------------------------------------------------------------
 
 def evaluate_nn_portfolio(market_data, config, architecture_name,
-                          initial_wealth=1.0, seed=1):
+                          initial_wealth=1.0, seed=1,
+                          device=None, compile_model=False):
     target_wealth = initial_wealth * config.target_multiplier
     gross_returns = np.exp(market_data.log_ret) - 1.0
     r_daily = market_data.r / 252.0
@@ -422,6 +423,9 @@ def evaluate_nn_portfolio(market_data, config, architecture_name,
             patience=getattr(config, 'nn_patience', 60),
             T=T_horizon,
             historical_returns=hist_rets,
+            # ── GPU / compile options ──────────────────────────────────────
+            device=device,
+            compile_model=compile_model,
         )
         # Pass step_idx AND wealth history so the network receives the correct
         # tau and rolling features at each step.
