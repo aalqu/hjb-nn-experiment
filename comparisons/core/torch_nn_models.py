@@ -1279,9 +1279,14 @@ def train_torch_policy_net(
     # ── Optional torch.compile() for inductor-fused CUDA kernels ─────────────
     if compile_model and dev.type == 'cuda':
         try:
-            model = torch.compile(model)
+            # PyTorch 2.8+ donated-buffer optimisation (enabled by torch.compile)
+            # is incompatible with create_graph=True, which PINN uses for
+            # second-order PDE residual gradients. Disable it so all archs work.
+            import torch._functorch.config as _functorch_cfg
+            _functorch_cfg.donated_buffer = False
+            model = torch.compile(model, dynamic=True)
             if verbose:
-                print(f"  [{architecture_name}] torch.compile() applied")
+                print(f"  [{architecture_name}] torch.compile() applied (dynamic=True, donated_buffer=False)")
         except Exception as e:
             if verbose:
                 print(f"  [{architecture_name}] torch.compile() skipped: {e}")
