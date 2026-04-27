@@ -1185,6 +1185,7 @@ def train_torch_policy_net(
     T=1.0,                 # horizon in years (used for tau normalisation)
     verbose=False,         # print training progress
     historical_returns=None,  # np.ndarray (T,n) — real returns for historical_replay
+    compile_model=False,   # apply torch.compile() (CUDA only, PyTorch ≥ 2.0)
     # ──────────────────────────────────────────────────────────────────
 ):
     """
@@ -1274,6 +1275,17 @@ def train_torch_policy_net(
 
     n_assets = len(mu_vec)
     model    = _build_model(architecture_name, n_assets, n_steps, d, u).to(dev)
+
+    # ── Optional torch.compile() for inductor-fused CUDA kernels ─────────────
+    if compile_model and dev.type == 'cuda':
+        try:
+            model = torch.compile(model)
+            if verbose:
+                print(f"  [{architecture_name}] torch.compile() applied")
+        except Exception as e:
+            if verbose:
+                print(f"  [{architecture_name}] torch.compile() skipped: {e}")
+
     opt      = optim.Adam(model.parameters(), lr=lr)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(
         opt, T_max=max(n_iters, 1), eta_min=lr * 0.05

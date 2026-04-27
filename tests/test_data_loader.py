@@ -46,7 +46,7 @@ def mkt20():
 
 class TestPortfolioLists:
     def test_keys(self):
-        assert set(PORTFOLIOS.keys()) == {5, 10, 20}
+        assert set(PORTFOLIOS.keys()) == {1, 5, 10, 20}
 
     def test_lengths(self):
         for n, tickers in PORTFOLIOS.items():
