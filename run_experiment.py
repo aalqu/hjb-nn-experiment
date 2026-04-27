@@ -830,6 +830,9 @@ def main():
                              "have a checkpoint under results/experiment/checkpoints/")
     parser.add_argument("--compile",  action="store_true",
                         help="enable torch.compile() on NN models (PyTorch ≥ 2.0 + CUDA)")
+    parser.add_argument("--paths",    type=int, default=None,
+                        help="override nn_paths (Monte Carlo batch size). "
+                             "Default 512; use 2048-8192 to saturate a high-end GPU.")
     args = parser.parse_args()
 
     n_assets_list = (
@@ -852,6 +855,9 @@ def main():
         seeds=seeds,
         nn_archs=nn_archs,
     )
+    if args.paths is not None:
+        config.nn_paths = args.paths
+        print(f"  nn_paths overridden → {args.paths}")
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     # ── Detect device and print GPU info ──────────────────────────────────────
