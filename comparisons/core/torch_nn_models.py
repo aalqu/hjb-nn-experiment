@@ -1277,19 +1277,20 @@ def train_torch_policy_net(
     model    = _build_model(architecture_name, n_assets, n_steps, d, u).to(dev)
 
     # ── Optional torch.compile() for inductor-fused CUDA kernels ─────────────
-    if compile_model and dev.type == 'cuda':
+    # PINN requires create_graph=True for second-order PDE residual gradients.
+    # torch.compile's aot_autograd backend does not support double backward,
+    # so we skip compilation for PINN unconditionally.
+    _uses_double_backward = (TORCH_ARCHITECTURES.get(architecture_name, {}).get('kind') == 'pinn')
+    if compile_model and dev.type == 'cuda' and not _uses_double_backward:
         try:
-            # PyTorch 2.8+ donated-buffer optimisation (enabled by torch.compile)
-            # is incompatible with create_graph=True, which PINN uses for
-            # second-order PDE residual gradients. Disable it so all archs work.
-            import torch._functorch.config as _functorch_cfg
-            _functorch_cfg.donated_buffer = False
             model = torch.compile(model, dynamic=True)
             if verbose:
-                print(f"  [{architecture_name}] torch.compile() applied (dynamic=True, donated_buffer=False)")
+                print(f"  [{architecture_name}] torch.compile() applied (dynamic=True)")
         except Exception as e:
             if verbose:
                 print(f"  [{architecture_name}] torch.compile() skipped: {e}")
+    elif compile_model and _uses_double_backward and verbose:
+        print(f"  [{architecture_name}] torch.compile() skipped (PINN uses double backward — aot_autograd limitation)")
 
     opt      = optim.Adam(model.parameters(), lr=lr)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(
